@@ -1,4 +1,4 @@
-        # SPEC file overview:
+# SPEC file overview:
 # https://docs.fedoraproject.org/en-US/quick-docs/creating-rpm-packages/#con_rpm-spec-file-overview
 # Fedora packaging guidelines:
 # https://docs.fedoraproject.org/en-US/packaging-guidelines/
@@ -25,43 +25,59 @@ BuildRequires: ninja-build
 Requires: openssl
 Requires: %{name}-libs%{?_isa} = 0:%{version}-%{release}
 
-# Don't include test binaries %bcond_with test
+# Don't include test binaries
+%bcond_with test
 
-%description A C99 TLS library
+%description
+A C99 TLS library
 
-%package libs Summary: A C99 compatable TLS library %description libs
+%package libs
+Summary: A C99 compatable TLS library
+
+%description libs
 s2n-tls is a C99 implementation of the TLS/SSL protocols that is
 designed to be simple, small, fast, and with security as a priority.
 
-%package devel Summary: Header files for s2n %description devel Header
-files for s2n-tls, a C99 implementation of the TLS/SSL protocols that
-is designed to be simple, small, fast, and with security as a
-priority.
+%package devel
+Summary: Header files for s2n
+
+%description devel
+Header files for s2n-tls, a C99 implementation of the TLS/SSL
+protocols that is designed to be simple, small, fast, and with
+security as a priority.
 
 %prep autosetup
 
-%build cmake -DUNSAFE_TREAT_WARNINGS_AS_ERRORS=OFF
-%-DBUILD_SHARED_LIBS=ON cmake_build
+%build
+%cmake_build -DUNSAFE_TREAT_WARNINGS_AS_ERRORS=OFF -DBUILD_SHARED_LIBS=ON 
 
 %check
 
-%install cmake_install
-
-%clean rm -rf %{buildroot}
+%install
+%cmake_install
 
 %post -p /sbin/ldconfig
 
 %postun -p /sbin/ldconfig
 
-%files libs defattr(-,root,root) license LICENSE attr(755,root,root)
+%files libs
+defattr(-,root,root)
+license LICENSE attr(755,root,root)
 %%{_libdir}/libs2n.so
+%if %{with test}
+attr(755,root,root)
+%{_bindir}/s2n*
+%endif
 
-%if %{with test} attr(755,root,root) %{_bindir}/s2n* endif
-
-%files devel {_includedir}/*.h
+%files devel
+{_includedir}/*.h
 %{_libdir}/cmake/s2n/modules/FindLibCrypto.cmake
 %{_libdir}/cmake/s2n/s2n-config.cmake
 %{_libdir}/cmake/s2n/shared/s2n-*.cmake
 
-%changelog * Thu Jan 20 2022 Doug Chapman <dougch@amazon.com> - Inital
-RPM spec build of v1.3.4
+%files
+license LICENSE attr(755,root,root)
+
+%changelog
+* Thu Jan 20 2022 Doug Chapman <dougch@amazon.com>
+- Initial RPM spec build of v1.3.4
