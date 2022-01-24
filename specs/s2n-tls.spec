@@ -10,7 +10,7 @@ Release: 0%{?dist}
 Summary: A C99 TLS library
 
 License: Apache2.0
-URL: https://github.com/aws/${name}
+URL: https://github.com/aws/%{name}
 Source0: %{url}/archive/v%{version}/%{name}-%{version}.tar.gz
 Group: System Environment/Libraries
 
